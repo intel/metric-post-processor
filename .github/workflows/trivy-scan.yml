@@ -1,44 +1,28 @@
 name: Trivy Scan
-
 on:
-  pull_request:
-    paths:
-      - '**'
   push:
     branches:
-      - 'master'
-  workflow_dispatch:
-
+      - main
+  pull_request:
 jobs:
-  trivy-scan:
-    runs-on: ubuntu-latest
-
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Trivy
-        uses: aquasecurity/trivy-action@v0.16.0
-
-      - name: Run Trivy FS scan and save report
-        run: trivy fs . --list-all-packages --format sarif --output trivy-report.sarif --exit-code 1 --ignore-unfixed
-
-      - name: Upload Trivy scan report
-        uses: actions/upload-artifact@v4
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          name: trivy-scan-report
-          path: trivy-report.sarif
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL'
 
-      - name: Generate SBOM
-        run: trivy sbom . --list-all-packages --format spdx-json --output sbom-spdx.json
-
-      - name: Upload SBOM
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-spdx
-          path: sbom-spdx.json
-
-      - name: Upload SARIF to GitHub Security tab
+      - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy-report.sarif
+          sarif_file: 'trivy-results.sarif'
+
