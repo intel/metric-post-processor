@@ -1,0 +1,55 @@
+name: Build pyrust_xlsxwriter wheels for Windows
+
+on:
+  pull_request:
+    paths:
+      - 'intel/metric-post-processor/rust/pyrust_xlsxwriter/**'
+      - '.github/workflows/build-windows-wheels.yml'
+  push:
+    branches:
+      - 'master'
+  workflow_dispatch:
+  schedule:
+    # run this workflow each night at 8:05AM (GMT time) == 1:05AM (PST) for default branch
+    # GitHub uses GMT timezone to trigger schedule
+    - cron: '8 05 * * *'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        python-version: [ '3.9', '3.10', '3.11', '3.12']
+
+    env:
+      rust_build_directory: rust\pyrust_xlsxwriter
+
+    steps:
+    - name: Checkout open-source repository
+      uses: actions/checkout@v4
+      with:
+        repository: 'intel/metric-post-processor'
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install maturin
+      run: pip install maturin
+
+    - name: Build pyrust_xlsxwriter
+      run: maturin build --release
+      working-directory: ${{ env.rust_build_directory }}
+
+    - name: Run Rust unit tests
+      run: cargo test --all
+      working-directory: ${{ env.rust_build_directory }}
+
+    - name: Upload wheel
+      uses: actions/upload-artifact@v4
+      with:
+        name: pyrust_xlsxwriter-python-${{ matrix.python-version }}-windows-wheel
+        path: ${{ env.rust_build_directory }}\target\wheels\pyrust_xlsxwriter-*.whl
+
