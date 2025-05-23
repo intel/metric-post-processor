@@ -3,15 +3,13 @@ name: Build pyrust_xlsxwriter wheels for Windows
 on:
   pull_request:
     paths:
-      - 'intel/metric-post-processor/rust/pyrust_xlsxwriter/**'
-      - '.github/workflows/build-windows-wheels.yml'
+      - 'rust/pyrust_xlsxwriter/**'
+      - '.github/workflows/build-linux-wheels.yml'
   push:
     branches:
-      - 'master'
+      - 'main'
   workflow_dispatch:
   schedule:
-    # run this workflow each night at 8:05AM (GMT time) == 1:05AM (PST) for default branch
-    # GitHub uses GMT timezone to trigger schedule
     - cron: '8 05 * * *'
 
 jobs:
