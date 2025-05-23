@@ -1,0 +1,47 @@
+name: Trivy Scan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate Cargo.lock
+        run: cargo generate-lockfile
+        working-directory: rust/pyrust_xlsxwriter
+
+      - name: Run Trivy vulnerability scanner in repo mode (SARIF)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL'
+
+      - name: Run Trivy to generate SBOM (SPDX JSON)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          format: 'spdx-json'
+          output: 'trivy-sbom.spdx.json'
+
+      - name: Upload Trivy SARIF as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results-sarif
+          path: trivy-results.sarif
+
+      - name: Upload Trivy SBOM (SPDX JSON) as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sbom-spdx-json
+          path: trivy-sbom.spdx.json
