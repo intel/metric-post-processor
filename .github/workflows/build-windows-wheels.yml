@@ -13,7 +13,7 @@ on:
     - cron: '8 05 * * *'
 
 jobs:
-  build:
+  build-windows-wheels:
     runs-on: windows-latest
 
     strategy:
