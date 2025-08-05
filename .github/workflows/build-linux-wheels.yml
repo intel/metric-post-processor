@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '8 05 * * *'
 
+permissions:
+  contents: read
+
 jobs:
   build-linux-wheels:
     runs-on: ubuntu-latest
