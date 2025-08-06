@@ -1,4 +1,4 @@
-name: Build pyrust_xlsxwriter wheels for Linux
+name: Build and test pyrust_xlsxwriter wheels for Linux
 
 on:
   pull_request:
@@ -39,11 +39,11 @@ jobs:
       run: pip install maturin
 
     - name: Build pyrust_xlsxwriter
-      run: maturin build --release --cargo-extra-args="--no-default-features"
+      run: maturin build --release --no-default-features
       working-directory: ${{ env.rust_build_directory }}
 
     - name: Run Rust unit tests
-      run: cargo test --all --no-default-features
+      run: cargo test --workspace --no-default-features
       working-directory: ${{ env.rust_build_directory }}
 
     - name: Upload wheel
