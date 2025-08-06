@@ -39,11 +39,11 @@ jobs:
       run: pip install maturin
 
     - name: Build pyrust_xlsxwriter
-      run: maturin build --release
+      run: maturin build --release --cargo-extra-args="--no-default-features"
       working-directory: ${{ env.rust_build_directory }}
 
     - name: Run Rust unit tests
-      run: cargo test --all
+      run: cargo test --all --no-default-features
       working-directory: ${{ env.rust_build_directory }}
 
     - name: Upload wheel
