@@ -2,9 +2,6 @@ name: Build pyrust_xlsxwriter wheels for Linux
 
 on:
   pull_request:
-    paths:
-      - 'rust/pyrust_xlsxwriter/**'
-      - '.github/workflows/build-linux-wheels.yml'
   push:
     branches:
       - 'main'
